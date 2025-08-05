@@ -23,16 +23,17 @@
                         Kecamatan
                     </th>
                     <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                        Hasil Prediksi
-                    </th>
-                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
                         Jumlah Guru
                     </th>
                     <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                        Kebutuhan
+                        Hasil Prediksi <br> Tahun Depan
+                    </th>
+
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                        Kebutuhan <br> Saat Ini
                     </th>
                     <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                        Nilai kebutuhan
+                        Nilai kebutuhan <br> Tahun Depan
                     </th>
                     <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
                         Keterangan
@@ -44,6 +45,9 @@
             </thead>
             <tbody>
                 <?php $i = 1; ?>
+                <?php
+                $totalKekuranganPositif = 0; // Inisialisasi variabel untuk total kekurangan positif
+                ?>
                 <?php foreach ($selisih as $s) : ?>
                     <tr>
                         <td class="px-5 py-3 border-b border-gray-200 bg-white text-sm">
@@ -61,11 +65,12 @@
                             ?>
                         </td>
                         <td class="px-5 py-3 border-b border-gray-200 bg-white text-sm">
-                            <?= $s['hasil_prediksi_id']; ?>
-                        </td>
-                        <td class="px-5 py-3 border-b border-gray-200 bg-white text-sm">
                             <?= $s['jumlah_guru_id']; ?>
                         </td>
+                        <td class="px-5 py-3 border-b border-gray-200 bg-white text-sm">
+                            <?= $s['hasil_prediksi_id']; ?>
+                        </td>
+
                         <td class="px-5 py-3 border-b border-gray-200 bg-white text-sm">
                             <?= number_format($s['kebutuhan']); ?>
                         </td>
@@ -74,6 +79,10 @@
                             // Check if 'nilai_selisih' key exists and is not null
                             if (isset($s['nilai_selisih']) && is_numeric($s['nilai_selisih'])) {
                                 echo number_format($s['nilai_selisih']);
+                                // Jika nilai_selisih positif (kekurangan), tambahkan ke total
+                                if ($s['nilai_selisih'] > 0) {
+                                    $totalKekuranganPositif += $s['nilai_selisih'];
+                                }
                             } else {
                                 echo 'N/A'; // Or any placeholder you prefer
                             }
@@ -130,6 +139,14 @@
                 </tr>
             </tfoot>
         </table>
+    </div>
+
+    <!-- Bagian Kesimpulan Baru -->
+    <div class="mt-8 p-6 bg-blue-50 border border-blue-200 rounded-lg shadow-md">
+        <h2 class="text-xl font-semibold text-blue-800 mb-4">Kesimpulan Kebutuhan Tenaga Pendidik</h2>
+        <p class="text-lg text-blue-700">
+            Total tenaga pendidik yang dibutuhkan pada tahun berikutnya adalah = <strong class="text-blue-900"><?= number_format($totalKekuranganPositif); ?></strong>
+        </p>
     </div>
 </div>
 <?= $this->endSection(); ?>

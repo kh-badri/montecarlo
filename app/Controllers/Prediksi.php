@@ -48,13 +48,16 @@ class Prediksi extends BaseController
                 // Loop melalui data siswa dan suntikkan data prediksi yang tersimpan
                 foreach ($data_siswa as $key => $row) {
                     if (isset($predictions_map[$row['kecamatan']])) {
+                        $data_siswa[$key]['id_prediksi'] = $predictions_map[$row['kecamatan']]['id_prediksi']; // Tambahkan id_prediksi
                         $data_siswa[$key]['angka_acak'] = $predictions_map[$row['kecamatan']]['angka_acak'];
                         $data_siswa[$key]['hasil_prediksi'] = $predictions_map[$row['kecamatan']]['hasil_prediksi'];
                     }
                 }
 
-                // Ambil juga total prediksi yang sudah tersimpan
-                $total_prediksi = $saved_predictions[0]['total_keseluruhan'];
+                // Ambil juga total prediksi yang sudah tersimpan (ambil dari salah satu record saja karena seharusnya sama)
+                if (isset($saved_predictions[0]['total_keseluruhan'])) {
+                    $total_prediksi = $saved_predictions[0]['total_keseluruhan'];
+                }
             }
             // =====================================================================
             // >> AKHIR BAGIAN BARU <<
@@ -93,7 +96,7 @@ class Prediksi extends BaseController
     }
 
     /**
-     * Metode simpan() - bisa dipertahankan untuk keperluan khusus
+     * Metode simpan() - diperbarui untuk melakukan update atau insert.
      */
     public function simpan()
     {
@@ -106,11 +109,11 @@ class Prediksi extends BaseController
         }
 
         $tahun_prediksi = $dataFromView[0]['tahun'];
-        $this->prediksiModel->where('tahun', $tahun_prediksi)->delete();
+        $updatedCount = 0;
+        $insertedCount = 0;
 
-        $dataToInsert = [];
         foreach ($dataFromView as $row) {
-            $dataToInsert[] = [
+            $dataToSave = [
                 'tahun'             => $row['tahun'],
                 'kecamatan'         => $row['kecamatan'],
                 'jumlah'            => $row['jumlah'],
@@ -120,13 +123,28 @@ class Prediksi extends BaseController
                 'angka_acak'        => $row['angka_acak'] ?? null,
                 'hasil_prediksi'    => $row['hasil_prediksi'] ?? null,
                 'total_keseluruhan' => $totalPrediksi,
-                'created_at'        => date('Y-m-d H:i:s'),
                 'updated_at'        => date('Y-m-d H:i:s'),
             ];
+
+            // Cek apakah data sudah ada berdasarkan tahun dan kecamatan
+            $existingRecord = $this->prediksiModel
+                ->where('tahun', $row['tahun'])
+                ->where('kecamatan', $row['kecamatan'])
+                ->first();
+
+            if ($existingRecord) {
+                // Jika data sudah ada, update record tersebut
+                $this->prediksiModel->update($existingRecord['id_prediksi'], $dataToSave);
+                $updatedCount++;
+            } else {
+                // Jika data belum ada, tambahkan created_at dan insert record baru
+                $dataToSave['created_at'] = date('Y-m-d H:i:s');
+                $this->prediksiModel->insert($dataToSave);
+                $insertedCount++;
+            }
         }
 
-        $this->prediksiModel->insertBatch($dataToInsert);
-        return redirect()->to('prediksi')->with('success', "Data prediksi untuk tahun {$tahun_prediksi} berhasil diperbarui.");
+        return redirect()->to('prediksi')->with('success', "Data prediksi untuk tahun {$tahun_prediksi} berhasil diperbarui: {$updatedCount} data diperbarui, {$insertedCount} data baru ditambahkan.");
     }
 
     // --- FUNGSI HELPER (TIDAK ADA PERUBAHAN) ---

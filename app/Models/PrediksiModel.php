@@ -6,9 +6,9 @@ use CodeIgniter\Model;
 
 class PrediksiModel extends Model
 {
-    protected $table            = 'prediksi';
-    protected $primaryKey       = 'id';
-    protected $allowedFields    = [
+    protected $table          = 'prediksi';
+    protected $primaryKey     = 'id_prediksi';
+    protected $allowedFields  = [
         'tahun',
         'kecamatan',
         'jumlah',
@@ -19,4 +19,9 @@ class PrediksiModel extends Model
         'hasil_prediksi',
         'total_keseluruhan'
     ];
+
+    protected $useTimestamps = false; // <-- UBAH INI MENJADI false
+    // protected $createdField  = 'created_at'; // Baris ini dan di bawahnya tidak akan berpengaruh jika useTimestamps false
+    // protected $updatedField  = 'updated_at';
+    // protected $deletedField  = 'deleted_at';
 }

@@ -108,7 +108,10 @@
                 <th class="px-6 py-3">CDF</th>
                 <th class="px-6 py-3">Batas</th>
                 <th class="px-6 py-3 bg-blue-100">Angka Acak</th>
-                <th class="px-6 py-3 bg-green-100">Hasil Prediksi</th>
+                <th class="px-6 py-3 bg-green-100 text-center">
+                    Hasil Prediksi<br>Tahun Depan
+                </th>
+
             </tr>
         </thead>
         <tbody>
